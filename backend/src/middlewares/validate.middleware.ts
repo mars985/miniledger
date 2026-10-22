@@ -8,7 +8,7 @@ export const validate = (
   schema: ZodType,
   source: RequestSource = "body",
 ): RequestHandler => {
-  return (req, res, next) => {
+  return (req, _res, next) => {
     const inputData = {
       ...req[source],
       loggedInUserId: req.user?._id,
@@ -20,7 +20,6 @@ export const validate = (
       return next(new ApiError(400, "Validation failed", result.error.issues));
     }
 
-    // Express 5 makes req.query a getter, so plain assignment would throw
     Object.defineProperty(req, source, {
       value: result.data,
       writable: true,
