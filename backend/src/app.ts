@@ -4,6 +4,7 @@ import express from "express";
 
 import pool from "./config/db.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import loanRouter from "./routes/loan.routes.js";
 import userRouter from "./routes/user.routes.js";
 
 const app = express();
@@ -17,6 +18,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/users", userRouter);
+app.use("/loans", loanRouter);
 
 app.use(errorHandler);
 
