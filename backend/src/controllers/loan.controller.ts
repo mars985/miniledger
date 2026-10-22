@@ -28,3 +28,11 @@ export const repayLoan: RequestHandler = async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, loan, "Loan marked as repaid"));
 };
+
+export const getLoanSummary: RequestHandler = async (req, res) => {
+  const userId = requireUserId(req);
+
+  const summary = await loanService.getLoanSummary(userId);
+
+  res.status(200).json(new ApiResponse(200, summary, "Loan summary"));
+};
