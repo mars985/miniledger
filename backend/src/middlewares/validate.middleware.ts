@@ -11,7 +11,7 @@ export const validate = (
   return (req, _res, next) => {
     const inputData = {
       ...req[source],
-      loggedInUserId: req.user?._id,
+      loggedInUserId: req.user?.id,
     };
 
     const result = validateData(schema, inputData);

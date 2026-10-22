@@ -3,6 +3,8 @@ import cors from "cors";
 import express from "express";
 
 import pool from "./config/db.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
@@ -13,6 +15,10 @@ app.use(express.json());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use("/users", userRouter);
+
+app.use(errorHandler);
 
 async function startServer() {
   try {
