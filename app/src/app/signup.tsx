@@ -3,10 +3,12 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, TextInput } from "react-native-paper";
+
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { OtpForm } from "@/components/auth/otp-form";
 import { FormError } from "@/components/form/form-error";
 import { FormTextInput } from "@/components/form/form-text-input";
+
 import { MAX_NAME_LENGTH, PHONE_LENGTH } from "@/constants/validation";
 import { useAuth } from "@/context/auth-context";
 import { getErrorMessage } from "@/lib/api";
