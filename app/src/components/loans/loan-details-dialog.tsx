@@ -18,8 +18,11 @@ interface LoanDetailsDialogProps {
 
 export function LoanDetailsDialog({ loan, onDismiss, onRepaid }: LoanDetailsDialogProps) {
   const { colors } = useTheme();
+  const [shownLoan, setShownLoan] = useState(loan);
   const [isRepaying, setIsRepaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (loan && loan !== shownLoan) setShownLoan(loan);
 
   const close = () => {
     if (isRepaying) return;
@@ -27,12 +30,15 @@ export function LoanDetailsDialog({ loan, onDismiss, onRepaid }: LoanDetailsDial
     onDismiss();
   };
 
+  if (!shownLoan) return null;
+
+  const state = getLoanState(shownLoan);
+
   const markRepaid = async () => {
-    if (!loan) return;
     setError(null);
     setIsRepaying(true);
     try {
-      await repayLoan(loan.id);
+      await repayLoan(shownLoan.id);
       onRepaid();
     } catch (err) {
       setError(getErrorMessage(err));
@@ -41,60 +47,54 @@ export function LoanDetailsDialog({ loan, onDismiss, onRepaid }: LoanDetailsDial
     }
   };
 
-  const state = loan ? getLoanState(loan) : null;
-
   return (
     <Portal>
       <Dialog visible={!!loan} onDismiss={close} style={styles.dialog}>
-        {loan && state && (
-          <>
-            <Dialog.Title numberOfLines={2}>{loan.friend_name}</Dialog.Title>
-            <Dialog.Content>
-              <View style={styles.amountRow}>
-                <Text variant="headlineMedium" style={styles.amount}>
-                  {formatCurrency(loan.amount)}
-                </Text>
-                <LoanStatusBadge state={state} />
-              </View>
-              <Text
-                variant="bodyMedium"
-                style={{ color: state === "overdue" ? colors.error : colors.onSurfaceVariant }}
-              >
-                {getDueDescription(loan)}
-              </Text>
+        <Dialog.Title numberOfLines={2}>{shownLoan.friend_name}</Dialog.Title>
+        <Dialog.Content>
+          <View style={styles.amountRow}>
+            <Text variant="headlineMedium" style={styles.amount}>
+              {formatCurrency(shownLoan.amount)}
+            </Text>
+            <LoanStatusBadge state={state} />
+          </View>
+          <Text
+            variant="bodyMedium"
+            style={{ color: state === "overdue" ? colors.error : colors.onSurfaceVariant }}
+          >
+            {getDueDescription(shownLoan)}
+          </Text>
 
-              <Divider style={styles.divider} />
+          <Divider style={styles.divider} />
 
-              <DetailRow label="Lent on" value={formatDate(loan.lent_on)} />
-              <DetailRow label="Due date" value={loan.due_date ? formatDate(loan.due_date) : "—"} />
-              <DetailRow
-                label="Repaid on"
-                value={loan.repaid_at ? formatDate(loan.repaid_at) : "Not yet"}
-              />
-              <DetailRow label="Recorded on" value={formatDate(loan.created_at)} />
+          <DetailRow label="Lent on" value={formatDate(shownLoan.lent_on)} />
+          <DetailRow label="Due date" value={shownLoan.due_date ? formatDate(shownLoan.due_date) : "—"} />
+          <DetailRow
+            label="Repaid on"
+            value={shownLoan.repaid_at ? formatDate(shownLoan.repaid_at) : "Not yet"}
+          />
+          <DetailRow label="Recorded on" value={formatDate(shownLoan.created_at)} />
 
-              <View style={styles.errorSpacing}>
-                <FormError message={error} />
-              </View>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={close} disabled={isRepaying}>
-                Close
-              </Button>
-              {state !== "repaid" && (
-                <Button
-                  mode="contained"
-                  icon="check"
-                  onPress={markRepaid}
-                  loading={isRepaying}
-                  disabled={isRepaying}
-                >
-                  Mark repaid
-                </Button>
-              )}
-            </Dialog.Actions>
-          </>
-        )}
+          <View style={styles.errorSpacing}>
+            <FormError message={error} />
+          </View>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={close} disabled={isRepaying}>
+            Close
+          </Button>
+          {state !== "repaid" && (
+            <Button
+              mode="contained"
+              icon="check"
+              onPress={markRepaid}
+              loading={isRepaying}
+              disabled={isRepaying}
+            >
+              Mark repaid
+            </Button>
+          )}
+        </Dialog.Actions>
       </Dialog>
     </Portal>
   );
