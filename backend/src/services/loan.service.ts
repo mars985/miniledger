@@ -1,8 +1,8 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { loansTable } from "../db/schema/index.js";
 import { ApiError } from "../utils/ApiError.js";
-import type { AddLoanEntryInput } from "../validators/loan.validator.js";
+import type { AddLoanEntryInput, ListLoansInput } from "../validators/loan.validator.js";
 
 export type Loan = typeof loansTable.$inferSelect;
 
@@ -28,6 +28,20 @@ export async function addLoanEntry(userId: number, input: AddLoanEntryInput): Pr
 
   if (!loan) throw new ApiError(500, "Failed to create loan");
   return loan;
+}
+
+export async function listLoans(userId: number, status: ListLoansInput["status"]): Promise<Loan[]> {
+  const statusFilter = {
+    all: undefined,
+    unpaid: isNull(loansTable.repaid_at),
+    repaid: isNotNull(loansTable.repaid_at),
+  }[status];
+
+  return db
+    .select()
+    .from(loansTable)
+    .where(and(eq(loansTable.user_id, userId), statusFilter))
+    .orderBy(desc(loansTable.lent_on), desc(loansTable.id));
 }
 
 export async function repayLoan(userId: number, loanId: number): Promise<Loan> {

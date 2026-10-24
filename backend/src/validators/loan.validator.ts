@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  LOAN_STATUSES,
   MAX_FRIEND_NAME_LENGTH,
   MAX_LOAN_AMOUNT,
   MIN_FRIEND_NAME_LENGTH,
@@ -36,5 +37,10 @@ export const repayLoanSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
+export const listLoansSchema = z.object({
+  status: z.enum(LOAN_STATUSES).default("all"),
+});
+
 export type AddLoanEntryInput = z.infer<typeof addLoanEntrySchema>;
 export type RepayLoanInput = z.infer<typeof repayLoanSchema>;
+export type ListLoansInput = z.infer<typeof listLoansSchema>;
