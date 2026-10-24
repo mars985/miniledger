@@ -47,7 +47,7 @@ export function DateInput({
             editable={false}
             disabled={disabled}
             error={!!errorMessage}
-            right={<TextInput.Icon icon="calendar" />}
+            right={<TextInput.Icon icon="calendar" accessible={false} accessibilityRole="none" />}
           />
         </View>
       </Pressable>
